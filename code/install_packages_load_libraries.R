@@ -29,10 +29,13 @@ if (!require("tibble", quietly = TRUE))
 
 library(devtools)
 if (!require("vmikk/metagMisc", quietly = TRUE))
-  devtools::install_github("vmikk/metagMisc")
+  devtools::install_github("vmikk/metagMisc",quiet = TRUE)
 
 if (!require("purrr", quietly = TRUE))
   install.packages("purrr")
+
+if (!require("ggpubr", quietly = TRUE))
+  install.packages("ggpubr")
 
 
 
@@ -45,7 +48,7 @@ library(purrr) # has map() to extract values from lists
 library(dplyr)
 library(tibble)
 library(tidyverse)
-
+library(ggpubr)
 
 
 

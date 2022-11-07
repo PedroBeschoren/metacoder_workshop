@@ -30,7 +30,7 @@ load("./data/ps_rarefied.Rdata")
 ps_rarefied # full ps object
 otu_table(ps_rarefied)[1:10,1:10] # 10 first rows across 10 first columns
 tax_table(ps_rarefied)[1:10,] # 10 first rows across all columns
-ps_rarefied@sam_data [1:10]# metadata
+ps_rarefied@sam_data [1:10,1:10]# metadata
 
 
 ``` 
@@ -62,15 +62,16 @@ taxmap_obj<-parse_phyloseq(ps_rarefied_filt)
 
 ```
 
-## 3.1 - check taxmap object you just created
+## 3.1 - EXERCISE check taxmap object you just created
 ```{r}
 # the taxmap object is a data container, just like phyloseq
 taxmap_obj
 
-# this object has much more than what you can see on one print, just like much other R output you generate. explroe it with "$" or "@" and tab-completion
+# this object has much more than what you can see on one print, just like much other R output you generate. 
+# EXERCISE: explroe taxmap_obj with "$" or "@" and tab-completion
 
 taxmap_obj$data$otu_table # otu tables...
-taxmap_obj$data # more of the data itself
+
 
 ```
 
@@ -89,13 +90,22 @@ heat_tree(.input = taxmap_obj, # your taxmap object from the metacoder package
           node_color = n_obs, # this fucntion from metacoder is called with non-standard evaluation (therefore, no arguments)
           node_label = taxon_names, # labels for the taxons
           layout = "davidson-harel", # The primary layout algorithm
-          initial_layout = "reingold-tilford",
-          output_file = "./results/heat_tree_test.pdf") # The layout algorithm that initializes node locations
+          initial_layout = "reingold-tilford", # The layout algorithm that initializes node locations
+          output_file = "./results/heat_tree_test.pdf") # A PDF file you will export this plot to
+
+
+
+```
+
+# EXERCISE - check what's produced with the n_obs argument/function and also check the taxa names 
+
+```{r}
 
 #n_obs is a function that takesyour taxmap object as input, and return the number of sequences in each taxa
 n_obs(taxmap_obj)
 
-
+#in metacoder, ab, ac, ad, etc refer each to a different taxonomy
+taxmap_obj$taxa
 
 
 
@@ -146,6 +156,7 @@ taxmap_obj %>%
 
 ## 3.4.2 - make individual roots for specific taxonomic groups
 
+This tree has a separated root at different taxonomic levels
 ```{r}
 
 # create a heat cleaner tree!
@@ -167,20 +178,21 @@ taxmap_obj %>%
 
 
 ## 3.5 - Compare 2 groups of samples
-lets now compare ASV abudnaces between two groups of samples, such as plant species in brassicaceae lineage I and II. 
+lets now compare ASV abundances between two groups of samples, such as plant species in brassicaceae lineage I and II (Sp_Lineage_Walden). 
 
 ### 3.5.1 -  calculate taxon abundance
-"tax_abund" is added as a data layer of the taxmap object. it defines the number of sequences on every single taxon  (all phyla, all classes, orders... this is different from counts of every single ASV). this data layer is needed on the next step.
+"tax_abund" is added as a data layer of the taxmap object. it defines the number of sequences on every single taxon  - all phyla, all classes, orders... this is different from counts of every single ASV! this data layer is needed on the next step.
 
 
 ```{r}
 #get abundance per taxon
-taxmap_obj$data$tax_abund<-calc_taxon_abund(obj = taxmap_obj, 
-                                      data = "otu_table",
-                                      cols = taxmap_obj$data$sample_data$sample_id) 
+taxmap_obj$data$tax_abund<-calc_taxon_abund(obj = taxmap_obj, # the taxmap object
+                                            data = "otu_table", # layer of data table to use
+                                            cols = taxmap_obj$data$sample_data$sample_id) #sample anmes
 
 #check the new data layer you created. note that "aab" refers to "k__Bacteria",  and "aac" to "p__Proteobacteria".  
 taxmap_obj$data$tax_abund
+
 #quickly compare those values to the OTU table to see the differnce:
 taxmap_obj$data$otu_table
 
@@ -194,7 +206,7 @@ here we define taxa "occurrence" by determining in how many samples of each grou
 #get occurrence of per lineage
 taxmap_obj$data$tax_occ_2lineages <- calc_n_samples(obj = taxmap_obj, 
                                                     data = "tax_abund", 
-                                                    cols = taxmap_obj$data$sample_data$sample_id, # What columns of sample data to use
+                                                    cols = taxmap_obj$data$sample_data$sample_id,
                                                     groups = taxmap_obj$data$sample_data$Sp_Lineage_Walden) # What category each sample is
 
 
@@ -232,18 +244,35 @@ taxmap_obj %>%
             node_color_interval = c(-3, 3), # The range of `log2_median_ratio` to display
             node_color_range = c("cyan", "gray", "tan"), # The color palette used
             layout = "davidson-harel",
+            node_color_axis_label = "Log2 ratio, cyan for Lineage I",
             initial_layout = "reingold-tilford",
             output_file = "./results/heat_tree_diff_lineages.pdf")
 
 
 ```
 
+
+# EXERCISE
+We just created a lot of new layers to the data of our taxmap object. can you dfind them using $ adn tab-completion?
+
+```{r}
+
+#check the names of the data layers we ahve
+names(taxmap_obj$data)
+
+# check one of tehse data layers....
+taxmap_obj$data
+  
+```
+
+
+
 ### 3.5.3 - supress non-significant differences and plot log changes again 
 this plot indicates log fold changes, but includes p values > 0.05. let's run any non-significat differences into a median log ratio of zero, shading them as grey in the plot
 
 ```{r}
 
-# set differental log ratio to 0 based on p values
+# set differential log ratio to 0 based on p values below 0.05
 taxmap_obj$data$diff_table_2lineages$log2_median_ratio[taxmap_obj$data$diff_table_2lineages$wilcox_p_value > 0.05] <- 0
 
 # plot the heatmap
@@ -255,8 +284,11 @@ taxmap_obj %>%
             node_color_interval = c(-3, 3), # The range of `log2_median_ratio` to display
             node_color_range = c("cyan", "gray", "tan"), # The color palette used
             layout = "davidson-harel",
+            node_color_axis_label = "Log2 ratio, cyan for Lineage I",
             initial_layout = "reingold-tilford",
             output_file = "./results/heat_tree_diff_lineages_pcut.pdf")
+
+
 
 
 
@@ -268,7 +300,7 @@ From this figure, we could see a larger presence of low-diversity phyla in linea
 
 ## 3.6 - Compare 3 or more groups of samples
 
-If you have more than 2 groups, like we have 3 different stresses, you can plot a matrix of heat trees with a dedicated function from the same package. before we do that, let's first calculate taxon abundance, prevalence, and log-fold changes like we did in chuncks 3.5.1 to 3.5.3
+If you have more than 2 groups, like we have 3 different stresses, you can plot a matrix of heat trees with a dedicated function from the same package. before we do that, let's first calculate taxon abundance, prevalence, and log-fold changes like we did in chunks 3.5.1 to 3.5.3
 
 ### 3.6.1 - calculate abudance, prevalence and log-fold in  3 treatment groups
 
@@ -324,20 +356,23 @@ heat_tree_matrix(taxmap_obj,
 
 ```
 
+# EXERCISE
+by changeing the code above, Make a matrix fo heat trees that plots the differences between the 3 plant species we are using. The metadata for that is present in the metadata column "sp_full_name". which alphaproteobacteria are more common in Brassica oleracea than Isatis tinctoria?
+
 
 
 ## 3.7 - create a matrix of heat trees from a phyloseq object with a single function
 
-These trees are iteresting, but as you start exploring real data and multiple options you will need a more efficienc way of running all this code. for this, we create a custom function that handles all of it at once, 
+These trees are interesting, but as you start exploring real data and multiple options you will need a more efficiency way of running all this code. for this, we create a custom function that handles all of it at once, 
 
 ### 3.7.1 - Define a custom function
 
 this custom function will: 
 
-1 - truncate the taxonomy table to genues level,  
+1 - truncate the taxonomy table to genus level,  
 2 - remove the g__ and f__ etc from taxonomy table
 3 - parse the phyloseq object into a taxmap object, 
-4 - calculate taxa occurence, abudance and log-fold differences between groups of samples
+4 - calculate taxa occurence, abudance and log-fold differences between groups of samples that you define
 5 - plot a heat tree
 
 It's arguments are
@@ -446,8 +481,8 @@ Now that we defined a new function that takes a phyloseq object as a data input 
 
 ```{r}
 # run custom function
-heat_tree_stress<-phyloseq_to_heat_tree_matrix2(ps_object = ps_rarefied_filt, sample_group = "Stress")
-heat_tree_lineage<-phyloseq_to_heat_tree_matrix2(ps_object = ps_rarefied_filt, sample_group = "Sp_Lineage_Walden")
+heat_tree_stress<-phyloseq_to_heat_tree_matrix(ps_object = ps_rarefied_filt, sample_group = "Stress")
+heat_tree_lineage<-phyloseq_to_heat_tree_matrix(ps_object = ps_rarefied_filt, sample_group = "Sp_Lineage_Walden")
 
 
 
@@ -459,296 +494,37 @@ heat_tree_lineage<-phyloseq_to_heat_tree_matrix2(ps_object = ps_rarefied_filt, s
 
 ### 3.7.3 - EXERCISE
 
-#### 3.7.3.1 - make more heat trees
+#### 3.7.3.1 - make more heat trees!
 
 Now produce new heat tree, based on metadata like "Sp_full_name", "greenhouse_compartment" or "Speed"!
 
 ```{r}
-#check sample metadata and create new comparisons!
+#check sample metadata and create new comparisons
 ps_rarefied@sam_data
 
 # put new metadata to define comparisons
-new_heat_tree1<-phyloseq_to_heat_tree_matrix2(ps_object = ps_rarefied_filt, sample_group = "")
+new_heat_tree1<-phyloseq_to_heat_tree_matrix(ps_object = ps_rarefied_filt, sample_group = "")
 
 
 ```
 
 #### 3.7.3.2 - see Burkholderiales ASVs with custom fucntion
 
-Our trees so far stopped at genus level, because ploting 2000 ASVs would overcrowd the plot. *Show the "Stress" effect at ASV level, but only on Burkholderiales. What do you have to change, and where?*
+Our trees so far stopped at genus level, because ploting 2000 ASVs would overcrowd the plot. *Show the "Sp_full_name" effect at ASV level, but only on Burkholderiales and Rhizobiales. What do you have to change, and where?* You can copy-paste and adjust the code we saw above,  make a new version of the custom function
 
 ```{r}
-# change the function to include ASV_id, and only visualize taxa within Burkholderiales.
-phyloseq_to_heat_tree_matrix_2<-function(ps_object, sample_group){
-  # this function output is a heat trees comparing metadata. the input is based on a phyloseq object
-  # ps object =  a phyloseq object, containing sample metadata, otu table, and taxonomy table
-  # sample_group = the name of a column in your emtadata that you want to compare in the heat tree. it has to be quoted.
-  # this function will create a matrix of heat trees if your metadata has more than 2 groups. it should fail if it has only 1 group
-  
 
-#remove unecessary taxonomic info (dada2id, "s__" and "ASV_id"") by updating the tax table with a subset of the tax table
-tax_table(ps_object)<-tax_table(ps_object)[,1:6]
-
-
-# let's remove the "r__"ranks from the taxonomy, they can be useful but will pollute our plot
-tax_table(ps_object)[, colnames(tax_table(ps_object))] <- gsub(pattern = "[a-z]__", # regular expression pattern to search for
-                                                                   x = tax_table(ps_object)[, colnames(tax_table(ps_object))], # "df"
-                                                                   replacement = "") # replacement for pattern
-# transform from phyloseq to taxmap object
-taxmap_obj<-parse_phyloseq(ps_object)
-
-#get abundance per taxon
-taxmap_obj$data$tax_abund<-calc_taxon_abund(obj = taxmap_obj, 
-                                      data = "otu_table",
-                                      cols = taxmap_obj$data$sample_data$sample_id) 
-
-#get occurrence of ASVs per treatment
-# the sample groups needs some wrangling to fit within the soft code of the function
-taxmap_obj$data$tax_occ<- calc_n_samples(obj = taxmap_obj, 
-                                                      data = "tax_abund", 
-                                                      cols = taxmap_obj$data$sample_data$sample_id,
-                                                      groups = taxmap_obj$data$sample_data[colnames(taxmap_obj$data$sample_data)==sample_group][[1]]) 
-
-# calculate log2 median ratios and p values for a wilcoxcon test within taxas in this stress treatment groups
-# the sample groups needs some wrangling to fit within the soft code of the function
-taxmap_obj$data$diff_table <- compare_groups(obj = taxmap_obj,
-                                                        data = "tax_abund",
-                                                        cols = taxmap_obj$data$sample_data$sample_id, 
-                                                        groups = taxmap_obj$data$sample_data[colnames(taxmap_obj$data$sample_data)==sample_group][[1]]) 
-
-# set differential log ratio to 0 based on adjusted p values
-taxmap_obj$data$diff_table$log2_median_ratio[taxmap_obj$data$diff_table$wilcox_p_value > 0.05] <- 0
-
-# define number of compared factors
-factors_compared<-taxmap_obj$data$sample_data[colnames(taxmap_obj$data$sample_data)==sample_group][[1]] 
-
-# draw the plot based on an if else statement: if there are 2 groups, plot a a heat tree comparing abundances between both groups, else plot a matrix of ehat trees. this function will fail if you only have 1 sample group! 
-
-
-if (length(unique(factors_compared)) == 2) {
-
-set.seed(1)
- output<- taxmap_obj %>%
-heat_tree(
-            node_label = taxon_names,
-      #      data = "diff_table", 
-            node_size = n_obs,
-            node_color = log2_median_ratio,
-            node_color_interval = c(-3, 3), # The range of `log2_median_ratio` to display
-            node_color_range = c("cyan", "gray", "tan"), # The color palette used
-            layout = "davidson-harel",
-            initial_layout = "reingold-tilford")
-
- } else {
-
-set.seed(1)
-output<-heat_tree_matrix(taxmap_obj,
-                         data = "diff_table", # this is the table with the data you want to plot
-                         node_size = n_obs, # n_obs is a function that calculates, in this case, the number of OTUs per taxon
-                         node_label = taxon_names,
-                         node_color = log2_median_ratio, # A column from `taxmap_obj$data$diff_table_3treatments`
-                         node_color_range = diverging_palette(), # The built-in palette for diverging data
-                         node_color_interval = c(-3, 3), # The range of `log2_median_ratio` to display
-                         edge_color_interval = c(-3, 3), # The range of `log2_median_ratio` to display
-                         node_size_axis_label = "Number of OTUs",
-                         node_color_axis_label = "Log2 ratio median proportions",
-                         layout = "davidson-harel", # The primary layout algorithm
-                         initial_layout = "reingold-tilford") # The layout algorithm that initializes node locations
-
-   
-   
- }
-
-
-# clearly define the output object you will get from the function
-return(output)   
-
-
-}
-
-burkholderiales_stress<-phyloseq_to_heat_tree_matrix_2(ps_object = ps_rarefied_filt, sample_group = "Stress")
 
 ```
 
 #### 3.7.3.2 - remove kingdom from taxonomy table
 
-Our trees so far have k__Bacteria as a shared root. *What will happen if you remove that taxonomic information? to make this change, What do you have to alter?*
-
-```{r}
-# change the function to remove k__Bacteria
-phyloseq_to_heat_tree_matrix_3<-function(ps_object, sample_group){
-  # this function output is a heat trees comparing metadata. the input is based on a phyloseq object
-  # ps object =  a phyloseq object, containing sample metadata, otu table, and taxonomy table
-  # sample_group = the name of a column in your emtadata that you want to compare in the heat tree. it has to be quoted.
-  # this function will create a matrix of heat trees if your metadata has more than 2 groups. it should fail if it has only 1 group
-  
-
-#remove unecessary taxonomic info (dada2id, "s__" and "ASV_id") by updating the tax table with a subset of the tax table
-tax_table(ps_object)<-tax_table(ps_object)[,2:6]
-
-
-# let's remove the "r__"ranks from the taxonomy, they can be useful but will pollute our plot
-tax_table(ps_object)[, colnames(tax_table(ps_object))] <- gsub(pattern = "[a-z]__", # regular expression pattern to search for
-                                                                   x = tax_table(ps_object)[, colnames(tax_table(ps_object))], # "df"
-                                                                   replacement = "") # replacement for pattern
-# transform from phyloseq to taxmap object
-taxmap_obj<-parse_phyloseq(ps_object)
-
-#get abundance per taxon
-taxmap_obj$data$tax_abund<-calc_taxon_abund(obj = taxmap_obj, 
-                                      data = "otu_table",
-                                      cols = taxmap_obj$data$sample_data$sample_id) 
-
-#get occurrence of ASVs per treatment
-# the sample groups needs some wrangling to fit within the soft code of the function
-taxmap_obj$data$tax_occ<- calc_n_samples(obj = taxmap_obj, 
-                                                      data = "tax_abund", 
-                                                      cols = taxmap_obj$data$sample_data$sample_id,
-                                                      groups = taxmap_obj$data$sample_data[colnames(taxmap_obj$data$sample_data)==sample_group][[1]]) 
-
-# calculate log2 median ratios and p values for a wilcoxcon test within taxas in this stress treatment groups
-# the sample groups needs some wrangling to fit within the soft code of the function
-taxmap_obj$data$diff_table <- compare_groups(obj = taxmap_obj,
-                                                        data = "tax_abund",
-                                                        cols = taxmap_obj$data$sample_data$sample_id, 
-                                                        groups = taxmap_obj$data$sample_data[colnames(taxmap_obj$data$sample_data)==sample_group][[1]]) 
-
-# set differential log ratio to 0 based on adjusted p values
-taxmap_obj$data$diff_table$log2_median_ratio[taxmap_obj$data$diff_table$wilcox_p_value > 0.05] <- 0
-
-# define number of compared factors
-factors_compared<-taxmap_obj$data$sample_data[colnames(taxmap_obj$data$sample_data)==sample_group][[1]] 
-
-# draw the plot based on an if else statement: if there are 2 groups, plot a a heat tree comparing abundances between both groups, else plot a matrix of ehat trees. this function will fail if you only have 1 sample group! 
-
-
-if (length(unique(factors_compared)) == 2) {
-
-set.seed(1)
- output<- taxmap_obj %>%
-heat_tree(
-            node_label = taxon_names,
-      #      data = "diff_table", 
-            node_size = n_obs,
-            node_color = log2_median_ratio,
-            node_color_interval = c(-3, 3), # The range of `log2_median_ratio` to display
-            node_color_range = c("cyan", "gray", "tan"), # The color palette used
-            layout = "davidson-harel",
-            initial_layout = "reingold-tilford")
-
- } else {
-
-set.seed(1)
-output<-heat_tree_matrix(taxmap_obj,
-                         data = "diff_table", # this is the table with the data you want to plot
-                         node_size = n_obs, # n_obs is a function that calculates, in this case, the number of OTUs per taxon
-                         node_label = taxon_names,
-                         node_color = log2_median_ratio, # A column from `taxmap_obj$data$diff_table_3treatments`
-                         node_color_range = diverging_palette(), # The built-in palette for diverging data
-                         node_color_interval = c(-3, 3), # The range of `log2_median_ratio` to display
-                         edge_color_interval = c(-3, 3), # The range of `log2_median_ratio` to display
-                         node_size_axis_label = "Number of OTUs",
-                         node_color_axis_label = "Log2 ratio median proportions",
-                         layout = "davidson-harel", # The primary layout algorithm
-                         initial_layout = "reingold-tilford") # The layout algorithm that initializes node locations
-
-   
-   
- }
-
-
-# clearly define the output object you will get from the function
-return(output)   
-
-
-}
-
-noKingdom_stress<-phyloseq_to_heat_tree_matrix_3(ps_object = ps_rarefied_filt, sample_group = "Sp_full_name")
-
-```
-
-
-
-
-# 5.0 adding external data to the heat trees
-What if we want to visualize other types of taxa-associated data, like p values from deseq2, importance in random forest predictions, or degree in a network? You can do that, as long as the vector of values you use as node_size or node_colour have the same lenght as the number of taxon names you are plotting. You can for example add another data layer to the taxmap object, or provide data from an independent df as teh argument of node_size or node_colour.
-
-lets first check some of the taxmap object structure, then create some random data and add it to the heat tree
-
+Our trees so far have k__Bacteria as a shared root. *What will happen if you remove that taxonomic information? to make this change, What do you have to alter?* You can copy-paste and adjust the code we saw above,  make a new version of the custom function
 
 ```{r}
 
-# let's review one of the more basic trees.
-taxmap_obj %>%
-  heat_tree(node_label = taxon_names,
-            node_size = n_obs,
-            node_color = n_obs,
-            layout = "davidson-harel",
-            initial_layout = "reingold-tilford")
-
-#let's see what si actually used as input for node size and color
-n_obs(taxmap_obj)
-
-# ab, es, ff etc all refer to specific nodes int he tree taxonomic groups. the number referts to how many sequences belong to that taxonomy (all 1000 sequences, are part of Bacteria "ab", 574 are Proteobacteria "ac")
-taxmap_obj$taxa
-
-# so if you have a vector from the same lenght of n_obs(taxmap_obj) with data from other analysis, you can visualize other outputs in a heat tree! lets prepare a df that will add new, random data
-
-
-
-
-
-#extract the names of the taxonomies in the heat tree, accoding the ab ac etc order
-taxon_id_metacoder<-lapply(taxmap_obj$taxa, function (x)
-                                                    x$get_name())%>%
-                                                    map(1)
-
-# now turn that list into a df
-taxon_id_metacoder<-do.call(rbind.data.frame, map(taxon_id_metacoder,1))
-
-# and change column name
-colnames(taxon_id_metacoder)<-"taxa_id"
-
-#make up some random new_data1
-set.seed(1)
-new_data1<-c(runif(n=100, min=1, max=10),
-            runif(n=200, min=5, max=15),
-            runif(n=100, min=10, max=20),
-            runif(n=57, min=20, max=25))
-
-#make up some random data new_data2
-set.seed(1)
-new_data2<-c(runif(n=57, min=1000, max=2000),
-             runif(n=200, min=600, max=1000),
-             runif(n=200, min=200, max=500))
-
-
-# add new (random example) data into the df
-taxon_id_metacoder$new_analysis_output1<-new_data1
-taxon_id_metacoder$new_analysis_output2<-new_data2
-
-
-# add the new data into the heat tree!
-taxmap_obj %>%
-  heat_tree(node_label = taxon_names,
-            node_size = taxon_id_metacoder$new_analysis_output2,
-            node_color = taxon_id_metacoder$new_analysis_output1,
-            node_size_axis_label = "Size: new data 2",
-            node_color_axis_label = "Color: new data 1",
-            layout = "davidson-harel",
-            initial_layout = "reingold-tilford")
-
-
 
 ```
-
-
-
-
-
-
-
-
 
 
 
@@ -791,17 +567,113 @@ sample_data(object = ps_l[[2]])
 lapply (list apply) will apply a function over a list. as we have a list of phyloseq objects now, it will be easy to produce several matrixes of heat trees. when working on lists of 33 species we learned that 33 plots are hardly helpful. still, the code and the concept (make a custom function that uses a phyloseq object as input, then run over a list with lapply) can be very useful on your own analysis
 
 ```{r}
-# run the custom function over a list of phyloseq objects
+# run the custom function over a list of phyloseq objects... it can take a moment
 heat_tree_stress_l<-lapply(ps_l, function(x)  
   phyloseq_to_heat_tree_matrix (ps_object = x, sample_group = "Stress"))
+
+heat_tree_stress_l<-ggarrange(heat_tree_stress_l$At,
+         heat_tree_stress_l$Bo_M,
+         heat_tree_stress_l$It,
+         labels = c(names(heat_tree_stress_l)))
 
 ```
 
 
 
+
+# 5.0 adding external data to the heat trees
+What if we want to visualize other types of taxa-associated data, like p values from deseq2, importance in random forest predictions, distances in an ordination, or degree in a network? You can do that, as long as the vector of values you use as node_size or node_colour have the same lenght as the number of taxon names you are plotting. You can for example add another data layer to the taxmap object, or provide data from an independent df as the argument of node_size or node_colour.
+
+TO explore this, lets first check some of the taxmap object structure, then create some random data and add it to the heat tree
+
+
+```{r}
+
+# let's review one of the more basic trees.
+taxmap_obj %>%
+  heat_tree(node_label = taxon_names,
+            node_size = n_obs,
+            node_color = n_obs,
+            layout = "davidson-harel",
+            initial_layout = "reingold-tilford")
+
+#let's review what is actually used as input for node size and color
+n_obs(taxmap_obj)
+
+# ab, es, ff etc all refer to specific nodes int he tree taxonomic groups. the number referts to how many sequences belong to that taxonomy (all 1000 sequences, are part of Bacteria "ab", 574 are Proteobacteria "ac")
+taxmap_obj$taxa
+
+```
+
+so if you have a vector from the same lenght of n_obs(taxmap_obj) with data from other analysis, you can visualize other outputs in a heat tree! lets prepare a df that will add new, random data
+
+
+
+```{r}
+#extract the names of the taxonomies in the heat tree, accoding the ab ac etc order
+taxon_id_metacoder<-lapply(taxmap_obj$taxa, function (x)
+                                                    x$get_name())%>%
+                                                    map(1)
+
+# now turn that list into a df
+taxon_id_metacoder<-do.call(rbind.data.frame, map(taxon_id_metacoder,1))
+
+# and change column name
+colnames(taxon_id_metacoder)<-"taxa_id"
+
+#make up some random data called new_data1
+set.seed(1)
+new_data1<-c(runif(n=100, min=1, max=10),
+            runif(n=200, min=5, max=15),
+            runif(n=100, min=10, max=20),
+            runif(n=57, min=20, max=25))
+
+#make up some random data called new_data2
+set.seed(1)
+new_data2<-c(runif(n=57, min=1000, max=2000),
+             runif(n=200, min=600, max=1000),
+             runif(n=200, min=200, max=500))
+
+
+# add new (random example) data into the df
+taxon_id_metacoder$new_analysis_output1<-new_data1
+taxon_id_metacoder$new_analysis_output2<-new_data2
+
+#this is the df we created using data external from metacoder
+taxon_id_metacoder
+
+
+# add the new data into the heat tree!
+taxmap_obj %>%
+  heat_tree(node_label = taxon_names,
+            node_size = taxon_id_metacoder$new_analysis_output2,
+            node_color = taxon_id_metacoder$new_analysis_output1,
+            node_size_axis_label = "Size: new data 2",
+            node_color_axis_label = "Color: new data 1",
+            layout = "davidson-harel",
+            initial_layout = "reingold-tilford")
+
+
+
+```
+
+
+Of course, there are countless ways you can integrate different pieces of data together - such as by matching the taxonomies ab, ac, ad etc; the names of the taxa like "f__Burkholderiales" etc. Note that you won't find sample code for this in the metacoder package documentation.
+
+
+
+
+
+
+
+
+
+
+
+
 # 5.1 - adding results of a fisher tests to a heat tree
 
-In the MeJA applications pilot were we tested different MeJA concentrations, we run different analysis that highlight taxa as "important": predictors for stress in random forest, keystone nodes in networks, and differentially abudnant ASVs in treatment-control comparisons. to select which of the taxonomies of these importnat taxa to focus on, we performed a fisher test to check if the proportions of a taxonomy are similar between the importnat ASVs and the ASVs that were not defined as important
+In the MeJA applications pilot were we tested different MeJA concentrations, we run different analysis that highlight taxa as "important": predictors for stress in random forest, keystone nodes in networks, and differentially abudnant ASVs in treatment-control comparisons. to select which of the taxonomies of these "important" taxa to focus on, we performed a fisher test to check if the proportions of a taxonomy are similar between the importnat ASVs and the ASVs that were not defined as important
 
 ```{r}
 # load a list of ASV names. these ASVs were hihglted as differentially abundant due to stress OR important in random forest predictions for stress OR network keystone/connector/hub of the species in a more complete dataset. I call these the "important"ASVs
@@ -1173,7 +1045,7 @@ ntaxa(subset_taxa(imp_ASV_ps_l$At, Order == "Rhizobiales"))
 
 # how many rhizobiales do we have in the set of 849 A. thaliana ASVs that were not tagged as important ?
 unimp_ASV_ps_at<-prune_taxa(!(taxa_names(ps_l$At) %in% imp_asv_list$At),
-                            ps_l$At) # a ps object with the "unimporntat" ASVs
+                            ps_l$At)%>% # a ps object with the "unimporntat" ASVs
 ntaxa(subset_taxa(unimp_ASV_ps_at , Order == "Rhizobiales"))
 
 #is 18 in 114 (~15%) similar to 63 in 849 (~7%)? if these proportions are statistically different, rhizobiales may be overrepresented in the important ASV
