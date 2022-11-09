@@ -1,11 +1,6 @@
 ---
 title: "metacoder workshop for the MICROP consortia"
 output: html_document
-knit: (function(input, ...) {
-    )
-    rmarkdown::render(
-      input,
-      output_dir = "../"
 date: "2022-10-25"
 author: "Pedro Beschoren da Costa, PhD"
 institute: "Entomology Department - Wageningen University & Research"
@@ -253,6 +248,8 @@ taxmap_obj$data$diff_table_2lineages <- compare_groups(obj = taxmap_obj,
 taxmap_obj$data$diff_table_2lineages
 
 ```
+
+*NOTE* that the "func" argument of the compare_groups() function allows you to use a custom function to calculate the significant of differential abudance tests. I have not tried to change the standard values, but you might be able to implement zimbwave in here.
 
 ### 3.6.4 - Plot heat tree showing log-fold differences
 tan indicates lineage II, cyan indicates lineage I
@@ -1426,7 +1423,7 @@ ps_all_taxa<-ps_l$At
 ```
 
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 
 
 
