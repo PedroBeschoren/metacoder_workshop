@@ -42,17 +42,19 @@ Bite-sized code chunks will make your script more understandable. even if you do
 ## Code outline
 
 The code outline was designed to help to navigate the script during the workshop. To open it, Click on the outline bottom in your R studio, or just press Ctrl+Shift+O
+The metacoder_workshop.HTML file is a knited version of the 
 
 ## Workshop (tentative) Schedule
 
-- Welcome and presentation (10 min)
-- create a single heat tree (5 min)
-- compare two groups of samples (5 min)
-- compare 3 or more groups of samples (5 min)
-- create heat trees from a custom function (10 min)
-- run custom function over a list of phyloseq objects (5 min)
-- add external data to heat trees (10 min)
-- add results of a fisher test to the heat trees (10 min)
+- Welcome and presentation (15 min)
+- create a single heat tree (10 min)
+- compare two groups of samples (10 min)
+- compare 3 or more groups of samples (10 min)
+- BREAK (5 min)
+- create heat trees from a custom function (20 min)
+- run custom function over a list of phyloseq objects (10 min)
+- add external data to heat trees (20 min)
+- add results of a fisher test to the heat trees (20 min)
 
 ### More resources
 
