@@ -19,17 +19,19 @@ In this workshop, we will learn how to use the metacoder R package. This worksho
   * Create project as a subdirectory of (the folder in your computer where the folder metacoder\_workshop will be created)
 ## setup and package installation
 To install all packages for this workshop, run chunk # 1.0 - "install packages, load libraries". It will check if you have the requested packages, and if you don't, they will be installed. it also loads all the libraries we will need for this project
+
 This step can take some minutes. please install packages ahead of time​
+
 Are you curious about the code being sourced from another R script? keep "install\_packages\_load\_libraries.R" selected with your cursor and press F2!
 ## running code chunks
 Bite-sized code chunks will make your script more understandable. even if you don't share, future you will be happy to see small pieces of code instead of huge and complex functions all at once To run a code chunk, you may:
-\*click the green triangle on the top right of each chunk ("run current chunk")
-\*select the code with the mouse and execute it (ctrl+enter)
-\*leave the cursor on the line you want to execute and just execute line by line (ctrl+enter)
+*click the green triangle on the top right of each chunk ("run current chunk")
+*select the code with the mouse and execute it (ctrl+enter)
+*leave the cursor on the line you want to execute and just execute line by line (ctrl+enter)
 
 To find all the code, open the file "./code/metacoder\_workshop.RMD" in your R studio session started from the metacoder\_workshop.Rproj file
 ## Code outline
-The metacoder\_workshop.HTML file is a knited version of the "./code/metacoder\_workshop.RMD" file, that actually holds all the script. you can sue it as a guide during the workshop
+The "metacoder\_workshop.HTML" file is a knited version of the "./code/metacoder\_workshop.RMD" file, that actually holds all the script. you can sue it as a guide during the workshop
 The code outline was designed to help to navigate the script during the workshop. To open it, click on the outline bottom in your R studio, or just press Ctrl+Shift+O
 ## Workshop (tentative) Schedule
 - Welcome and presentation (15 min)
@@ -41,11 +43,12 @@ The code outline was designed to help to navigate the script during the workshop
 - run custom function over a list of phyloseq objects (10 min)
 - add external data to heat trees (20 min)
 - add results of a fisher test to the heat trees (20 min)
+
 ### More resources
 There are many resources for the metacoder package
 
 Documentation (with examples): https://grunwaldlab.github.io/metacoder\_documentation/​
-Original paper: https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005404​
-GitHub: https://github.com/grunwaldlab/metacoder​
-CRAN manual: https://cran.r-project.org/web/packages/metacoder/metacoder.pdf​
-Youtube (kind of old): https://www.youtube.com/watch?v=Nv6dsWjr5sA
+*Original paper: https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005404​
+*GitHub: https://github.com/grunwaldlab/metacoder​
+*CRAN manual: https://cran.r-project.org/web/packages/metacoder/metacoder.pdf​
+*Youtube (kind of old): https://www.youtube.com/watch?v=Nv6dsWjr5sA
