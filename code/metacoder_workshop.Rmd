@@ -37,12 +37,14 @@ load("./data/ps_rarefied.Rdata")
 
 #check ps object
 ps_rarefied # full ps object
-otu_table(ps_rarefied)[1:5,1:5] # 5 first rows across 5 first columns
-tax_table(ps_rarefied)[1:5,] # 5 first rows across all columns
-ps_rarefied@sam_data [1:5,1:5]# metadata
+otu_table(ps_rarefied)[1:5,1:5] # 5 otu table first rows across 5 first columns
+tax_table(ps_rarefied)[1:5,] # 5 taxonomy first rows across all columns
+ps_rarefied@sam_data [1:5,1:5]# metadata, 5 first rows across 5 first columns
 
 
 ``` 
+
+Both phyloseq and metacoder can take any feature table with taxonomic ranks and metadata. Therefore you can include community data about fungi, insects, plants etc. To import any kind of data into phyloseq, you cna check this tutorial: https://joey711.github.io/phyloseq/import-data.html#phyloseq-ize_data_already_in_r
 
 
 # 3.0 - Create a single taxmap object for a single heat tree
