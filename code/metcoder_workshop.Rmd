@@ -1,6 +1,12 @@
 ---
 title: "metacoder_workshop"
 output: html_document
+knit: (function(input, ...) {
+    rmarkdown::render(
+      input,
+      output_dir = "../"
+    )
+  })
 date: "2022-10-25"
 editor_options: 
   chunk_output_type: console
@@ -8,12 +14,14 @@ editor_options:
 
 
 ```{r, setup, include=FALSE}
+### you can safely ignore this chunk as a workshop participant ###
+
 # this an an R markdown option for knitting documents, because working directory changes automatically in chunks. if you want details, check https://bookdown.org/yihui/rmarkdown-cookbook/working-directory.html
 knitr::opts_knit$set(root.dir = '../')
 ```
 
 
-# 1.0 - install packages, load libraries
+# 1.0 - Install packages, load libraries
 
 Here we source the bit of code that performs this operation. essentially, this one-line command runs an entire R script file. This can be handy when you load the same libraries in different steps of your analysis
 
@@ -23,11 +31,9 @@ source("./code/install_packages_load_libraries.R")
 
 ```
 
-# 2.0 - load and check data
+# 2.0 - Load and check data
 
-Here we will load  data from 3 species in the Brassicacea family experiment: Arabdopsis thaliana, Brassica oleraceae and Isatis tinctoria. This data has been heavily filtered to reduce complexity and size. 
-
-You will see that the data is stored as a list of 3 phyloseq objects. we can acess this in different ways
+Here we will load  data from 3 species in the Brassicacea family experiment: Arabidopsis thaliana, Brassica oleraceae and Isatis tinctoria. This data has been heavily filtered to reduce complexity and size. 
 
 ```{r}
 # load object
@@ -43,15 +49,15 @@ ps_rarefied@sam_data [1:5,1:5]# metadata
 ``` 
 
 
-# 3.0 - create a single taxmap object for a single heat tree
+# 3.0 - Create a single taxmap object for a single heat tree
 
-For a simple start, let's create individual heat trees from an individual plyloseq object
+For a simple start, let's create individual heat trees from an individual phyloseq object
 ```{r, message = FALSE}
 
 # make a copy of you rarefied ps object
 ps_rarefied_filt<-ps_rarefied
 
-#remove unecessary taxonomic info (dada2id, "s__" and "ASV_id") by updating the tax table with a subset of the tax table
+#remove unecessary taxonomic info ("ASV_id") by updating the tax table with a subset of the tax table
 tax_table(ps_rarefied_filt)<-tax_table(ps_rarefied_filt)[,1:6]
 
 
@@ -68,24 +74,24 @@ taxmap_obj<-parse_phyloseq(ps_rarefied_filt)
 ## 3.1 - EXERCISE check taxmap object you just created
 
 taxmap_obj is a object from the Taxmap class, but can be navigated as a nested list.
-explore taxmap_obj with "$"  and tab-completion. can you find the representative sequences in the data layer?
+Explore taxmap_obj with "$"  and tab-completion. can you find the representative sequences in the data layer?
 ```{r, message = FALSE, results = "hide"}
 
 # the taxmap object is a data container, just like phyloseq
 taxmap_obj
 
 # this object has much more than what you can see on one print, just like much other R output you generate. 
-taxmap_obj$data$tax_data # otu tables...
-taxmap_obj$taxa # taxonomy names, rnks and codes
+taxmap_obj$data$tax_data # taxa tables...
+taxmap_obj$taxa # taxonomy names, ranks and codes
 
 
 ```
 
-## 3.2 - create the heat tree visualization
+## 3.2 - Create the heat tree visualization
 
 Now we can create a heat tree, with colors indicating the number of sequences in each taxa. 
 
-The first tree is actually quite busy - depending on your goal, you might want to further filter the input ASVs to a smaller subset like all differentially abudnant ASVs or features defined as core microbiome communities
+The first tree is actually quite busy - depending on your goal, you might want to further filter the input ASVs to a smaller subset like all differentially abundant ASVs or features defined as core microbiome communities
 
 ```{r, message = FALSE, warning = FALSE}
 
@@ -145,11 +151,11 @@ taxmap_obj %>%
 
 
 
-## 3.5 - modify the tree with available options
+## 3.5 - Modify the tree with available options
 
 There are many options to customize these trees, we will only explore a few of them
 
-### 3.5.1 -  truncate at order level
+### 3.5.1 -  Truncate at order level
 
 This tree stops at Order level
 ```{r, message = FALSE, warning = FALSE}
@@ -214,7 +220,7 @@ taxmap_obj$data$otu_table
 
 ```
 
-### 3.6.2 -  calculate taxon prevalence/occumpancy
+### 3.6.2 -  Calculate taxon prevalence/occumpancy
 
 here we define taxa "occurrence" by determining in how many samples of each group they appear
 ```{r, message = FALSE}
@@ -232,7 +238,7 @@ taxmap_obj$data$tax_occ_2lineages
 
 ```
 
-### 3.6.3 -  calculate log fold changes between two groups
+### 3.6.3 -  Calculate log fold changes between two groups
 Here we see log fold changes
 
 ```{r, message = FALSE}
@@ -247,7 +253,7 @@ taxmap_obj$data$diff_table_2lineages
 
 ```
 
-### 3.6.4 - plot heat tree showing log-fold differences
+### 3.6.4 - Plot heat tree showing log-fold differences
 tan indicates lineage II, cyan indicates lineage I
 
 ```{r, message = FALSE, warning = FALSE}
@@ -271,8 +277,8 @@ taxmap_obj %>%
 
 
 
-### 3.6.5 - supress non-significant differences and plot log changes again 
-this plot indicates log fold changes, but includes p values > 0.05. let's run any non-significat differences into a median log ratio of zero, shading them as grey in the plot
+### 3.6.5 - Supress non-significant differences and plot log changes again 
+This plot indicates log fold changes, but includes p values > 0.05. let's run any non-significant differences into a median log ratio of zero, shading them as grey in the plot
 
 ```{r, message = FALSE, warning = FALSE}
 
@@ -305,13 +311,13 @@ From this figure, we could see a larger presence of low-diversity phyla in linea
 
 ## 3.7 - Compare 3 or more groups of samples
 
-If you have more than 2 groups, like we have 3 different stresses, you can plot a matrix of heat trees with a dedicated function from the same package. before we do that, let's first calculate taxon abundance, prevalence, and log-fold changes like we did in chunks 3.5.1 to 3.5.3
+If you have more than 2 groups, like we have 3 different stresses, you can plot a matrix of heat trees with a dedicated function from the same package. Before we do that, let's first calculate taxon abundance, prevalence, and log-fold changes like we did in chunks 3.5.1 to 3.5.3
 
-### 3.7.1 - calculate abudance, prevalence and log-fold in  3 treatment groups
+### 3.7.1 - Calculate abudance, prevalence and log-fold in  3 treatment groups
 
 ```{r, message = FALSE, warning = FALSE}
 
-#abundance per taxon was already calculated in chunk 3.5.1, now we jsut overwrite
+#abundance per taxon was already calculated in chunk 3.5.1, now we just overwrite
 taxmap_obj$data$tax_abund<-calc_taxon_abund(obj = taxmap_obj, 
                                             data = "otu_table", 
                                             cols = taxmap_obj$data$sample_data$sample_id) 
@@ -340,7 +346,7 @@ names(taxmap_obj$data$diff_table_3treatments)[4]<-"log2_median_ratio_stress"
 
 
 ### 3.7.2 - Plot a matrix of heat trees
-Now that we have log-fold differences in pariwise treatment comparisons, let's compare them in a matrix of heat trees
+Now that we have log-fold differences in pairwise treatment comparisons, let's compare them in a matrix of heat trees
 
 ```{r, message = FALSE, warning = FALSE}
 
@@ -364,7 +370,7 @@ heat_tree_matrix(taxmap_obj,
 ```
 
 ### 3.7.3 - EXERCISE change grouping variable 
-by changing the code above, Make a matrix of heat trees that plots the differences between the 3 plant species we are using. The metadata for that is present in the metadata column "sp_full_name". which alphaproteobacteria are more common in Brassica oleracea than Isatis tinctoria?
+by changing the code above, Make a matrix of heat trees that plots the differences between the 3 plant species we are using. The metadata for that is present in the metadata column "sp_full_name". Which alphaproteobacteria are more common in Brassica oleracea than Isatis tinctoria?
 
 ```{r, include=FALSE}
 # code your exercise here!
@@ -378,18 +384,18 @@ by changing the code above, Make a matrix of heat trees that plots the differenc
 # QUESTION BREAK
 
 
-## 3.8 - create a matrix of heat trees from a phyloseq object with a single function
+## 3.8 - Create a matrix of heat trees from a phyloseq object with a single function
 
-These trees are interesting, but as you start exploring real data and multiple options you will need a more efficiency way of running all this code. for this, we create a custom function that handles all of it at once, 
+These trees are interesting, but as you start exploring real data and multiple options you will need a more efficiency way of running all this code. For this, we create a custom function that handles all of it at once, 
 
 ### 3.8.1 - Define a custom function
 
-this custom function will: 
+This custom function will: 
 
 1 - truncate the taxonomy table to genus level,  
 2 - remove the g__ and f__ etc from taxonomy table
 3 - parse the phyloseq object into a taxmap object, 
-4 - calculate taxa occurence, abudance and log-fold differences between groups of samples that you define
+4 - calculate taxa occurrence, abundance and log-fold differences between groups of samples that you define
 5 - plot a heat tree
 
 It's arguments are
@@ -492,9 +498,9 @@ return(output)
 
 ```
 
-### 3.8.2 - creating heat trees from a custom function
+### 3.8.2 - Creating heat trees from a custom function
 
-Now that we defined a new function that takes a phyloseq object as a data input and a column of the metadata as an argument, we can more easely produce heat trees across the variables.
+Now that we defined a new function that takes a phyloseq object as a data input and a column of the metadata as an argument, we can more easily produce heat trees across the variables.
 
 
 
@@ -503,8 +509,10 @@ Now that we defined a new function that takes a phyloseq object as a data input 
 heat_tree_stress<-phyloseq_to_heat_tree_matrix(ps_object = ps_rarefied, sample_group = "Stress")
 heat_tree_lineage<-phyloseq_to_heat_tree_matrix(ps_object = ps_rarefied, sample_group = "Sp_Lineage_Walden")
 
-# check new trees
+# check stress tree
 heat_tree_stress
+
+# check lineage tree
 heat_tree_lineage
 
 
@@ -555,11 +563,11 @@ Our trees so far have k__Bacteria as a shared root. *What will happen if you rem
 
 
 
-# 4.0 - create a list of taxmap objects for a single heat tree
+# 4.0 - Create a list of taxmap objects for a single heat tree
 Now that we have a function that takes a single phyloseq object as input, let's run it across all the species in the dataset
 
 
-## 4.1 - create a list of phyloseq objects
+## 4.1 - Create a list of phyloseq objects
 First, let's split the phyloseq object into a list of phyloseq objects according the species
 
 note that the phyloseq input is based on the original phyloseq object, that still contains the ranks as p__Proteobacteria, o__Rhizobiales, etc
@@ -573,7 +581,7 @@ ps_l<- metagMisc::phyloseq_sep_variable(ps_rarefied, variable = "Sp_abb_name")
 ```
 
 
-## 4.2 - check list of phyloseq objects
+## 4.2 - Check list of phyloseq objects
 Let's check the list we just created. there are different ways we can do this
 
 
@@ -593,12 +601,12 @@ sample_data(object = ps_l[[2]])[1:5,1:5]
 ```
 
 
-## 4.4 - run custom function on list of phyloseq objects
-lapply (list apply) will apply a function over a list. as we have a list of phyloseq objects now, it will be easy to produce several matrixes of heat trees. when working on lists of 33 species we learned that 33 plots are hardly helpful. still, the code and the concept (make a custom function that uses a phyloseq object as input, then run over a list with lapply) can be very useful on your own analysis
+## 4.4 - Run custom function on list of phyloseq objects
+lapply (list apply) will apply a function over a list. as we have a list of phyloseq objects now, it will be easy to produce several matrices of heat trees. when working on lists of 33 species we learned that 33 plots are hardly helpful. still, the code and the concept (make a custom function that uses a phyloseq object as input, then run over a list with lapply) can be very useful on your own analysis
 
 ```{r, message = FALSE, warning = FALSE}
 
-# are you new to lapply? see here how it works. you firt provide a list, and then a function you will use independently on each element x of your list. here we siply count the number of taxa of each of the 3 phyloseq objects in the list
+# are you new to lapply? see here how it works. you first provide a list ("ps_l"), and then a function ("ntaxa") you will run independently on each element x of your list(ps_l$At, ps_l$Bo_M, ps_l$It). here we simply count the number of taxa of each of the 3 phyloseq objects in the list
 lapply(ps_l, function(x)  
   ntaxa(x))
 
@@ -613,13 +621,13 @@ heat_tree_stress_l<-lapply(ps_l, function(x)
 
 # QUESTION BREAK
 
-# 5.0 - adding external data to the heat trees
-What if we want to visualize other types of taxa-associated data, like p values from deseq2, importance in random forest predictions, distances in an ordination, or degree in a network? You can do that, as long as the vector of values you use as node_size or node_colour have the same lenght as the number of taxon names you are plotting. You can for example add another data layer to the taxmap object, or provide data from an independent df as the argument of node_size or node_colour.
+# 5.0 - Adding external data to the heat trees
+What if we want to visualize other types of taxa-associated data, like p values from deseq2, importance in random forest predictions, distances in an ordination, or degree in a network? You can do that, as long as the vector of values you use as node_size or node_colour have the same length as the number of taxon names you are plotting. You can for example add another data layer to the taxmap object, or provide data from an independent df as the argument of node_size or node_colour.
 
 
 
-## 5.1 - check some input arguments of a heat tree
-TO explore this, lets first check some of the taxmap object structure, then create some random data and add it to the heat tree
+## 5.1 - Check some input arguments of a heat tree
+To explore this, lets first check some of the taxmap object structure, then create some random data and add it to the heat tree
 
 
 ```{r, message = FALSE, warning = FALSE, results='hide'}
@@ -643,14 +651,13 @@ taxmap_obj$taxa[1:10]
 
 
 
-so if you have a vector from the same lenght of n_obs(taxmap_obj) with data from other analysis, you can visualize other outputs in a heat tree! lets prepare a df that will add new, random data
+So if you have a vector from the same length of n_obs(taxmap_obj) with data from other analysis, you can visualize other outputs in a heat tree! lets prepare a df that will add new, random data
 
 
 
-## 5.2 - extract taon infor from the heatmap object
-let's extract the taxon ides from the metacoder object 
+## 5.2 - Extract taxon information from the taxmap object
+let's extract the taxon ids from the taxmap object 
 
-then create new (random) data, and add this random data to the heat tree
 ```{r, message = FALSE, warning = FALSE}
 #extract the names of the taxonomies in the heat tree, accoding the ab ac etc order
 taxon_id_metacoder<-lapply(taxmap_obj$taxa, function (x)
@@ -668,8 +675,8 @@ head(taxon_id_metacoder)
 
 ```
 
-## 5.3 - check some input arguments of a heat tree
-then create new (random) data, adn add it to the taxon information you extrated
+## 5.3 - Check some input arguments of a heat tree
+then create new (random) data, and add it to the taxon information you extracted
 ```{r, message = FALSE, warning = FALSE}
 
 #make up some random data called new_data1
@@ -695,10 +702,10 @@ taxon_id_metacoder[1:10,]
 ```
 
 
-## 5.4 - make a new heat tree with the enw random data
+## 5.4 - Make a new heat tree with the new random data
 the size of the node will relate to the first column of the new dataframe. the color of the node will related the the second column of the new dataframe
 
-in a real case, you would have your valuable data, taxon by taxon, in a dataframe with simialr structure
+in a real case, you would have your valuable data, taxon by taxon, in a dataframe with similar structure
 
 ```{r, message = FALSE, warning = FALSE}
 
@@ -718,12 +725,12 @@ taxmap_obj %>%
 ```
 
 
-Of course, there are countless ways you can integrate different pieces of data together - such as by matching the taxonomies ab, ac, ad etc; the names of the taxa like "f__Burkholderiales" etc. Note that you won't find sample code for this - adding external data -  in the metacoder package documentation.
+Of course, there are countless ways you can integrate different pieces of data together - such as by matching the taxonomies ab, ac, ad etc; the names of the taxa like "f__Burkholderiales" etc. Note that you won't find sample code for this (adding external data)  in the metacoder package documentation.
 
 
 
 
-
+# QUESTION BREAK
 
 
 
@@ -733,13 +740,15 @@ Of course, there are countless ways you can integrate different pieces of data t
 
 # 6.0 - adding results of a fisher tests to a heat tree
 
-In the MeJA applications pilot were we tested different MeJA concentrations, we run different analysis that highlight taxa as "important": predictors for stress in random forest, keystone nodes in networks, and differentially abudnant ASVs in treatment-control comparisons. to select which of the taxonomies of these "important" taxa to focus on, we performed a fisher test to check if the proportions of a taxonomy are similar between the importnat ASVs and the ASVs that were not defined as important
+In the MeJA applications pilot were we tested different MeJA concentrations, we run different analysis that highlight taxa as "important": predictors for stress in random forest, keystone nodes in networks, and differentially abundant ASVs in treatment-control comparisons. to select which of the taxonomies of these "important" taxa to focus on, we performed a fisher test to check if the proportions of a taxonomy are similar between the important ASVs and the ASVs that were not defined as important.
 
-## 6.1 - load important taxa names, create new ps object
+The paper with further details should be submitted for publication this by Nov/Dez 2022 ~ you can cite that paper in the near future to use this code
 
-these ASVs listed in "imp_asv_list.Rdata" were highlighted as differential abundant due to stress OR important in random forest predictions for stress OR network keystone/connector/hub of the species in a more complete dataset. I call these the "important"ASVs.
+## 6.1 - Load important taxa names, create new ps object
 
-after we load these ASVs anmes, we create a list of new ps objects by running phyloseq::prune_taxa (a funcntion that selects taxa in a ps object according a character vector) with base::mapply  (a function that runs a function on two lists simultaneously)
+These ASVs listed in "imp_asv_list.Rdata" were highlighted as differential abundant due to stress treatments OR important in random forest predictions for stress treatments OR network keystone/connector/hub of the species in a more complete dataset (with 70k ASVs). I call these the "important"ASVs.
+
+After we load these ASVs names, we create a list of new ps objects by running phyloseq::prune_taxa (a function that selects taxa in a ps object according a character vector) with base::mapply  (a function that runs a function on two lists simultaneously)
 
 ```{r}
 # load a list of ASV names. 
@@ -760,6 +769,7 @@ imp_ASV_ps_l
 
 ```
 
+*NOTE* that the input is just a list of ASV names. you could use this function to summarize any other analysis method that tags several ASVs as relevant in your analysis
 
 ## 6.2 - define the funciton that calculates fisher tests and heat trees
 If we have the time, we explore details for these functions. their description and comments should be fairly sufficiency
@@ -1110,7 +1120,7 @@ set.seed(1)
 ## 6.3 - check some of the proportions we will test
 is a specific taxonomy overly frequent in the "important" dataset when compared to the taxonomies of the ASV that were NOT defined as important?
 
-note that the phyloseq input is based on the original phyloseq object, that still contains the ranks as p__Proteobacteria, o__Rhizobiales, etc
+*note* that this phyloseq input is based on the original phyloseq object, that still contains the ranks as p__Proteobacteria, o__Rhizobiales, etc
 
 ```{r message=FALSE, warning=FALSE}
 
@@ -1128,9 +1138,15 @@ ntaxa(physeq = subset_taxa(unimp_ASV_ps_at, Order == "o__Rhizobiales"))
 
 
 ```
-is 18 in 114 (~15%) similar to 63 in 849 (~7%), considering we have in total 18+63 (81) rhizobiales in 114+849 (983) bASVs? if these proportions are statistically different, rhizobiales may be overrepresented in the important ASV set
+is 18 in 114 (~15%) similar to 63 in 849 (~7%), considering we have in total 18+63 (81) rhizobiales in 114+849 (983) bASVs? if these proportions are statistically different, rhizobiales may be over represented in the important ASV set. 
 
-## 6.4 - calculate prortions of the fisher test
+What are we actually testing here? if the important ASVs are just a random subset of the complete dataset, the proportion of rhizobiales in both datasets should be similar
+
+In other words: the chance that these many rhizobiales were tagged as "important" *just because there is a lot of rhizobiales in the full/background dataset* is too small.
+
+
+
+## 6.4 - calculate proportions of the fisher test
 
 by running the functions defined in chunk #6.2, we test the proportions stated in chunk # 6.3 - on all taxonomic levels of your input phyloseq object
 
@@ -1140,7 +1156,7 @@ fisher_output_at<-fisher_all_taxa_groups(ps_important_taxa = imp_ASV_ps_l$At,
                                          ps_all_taxa = ps_l$At)
 
 #check raw ouput of fisher tests for rhizobiales
-fisher_output_at
+fisher_output_at[1:3]
 fisher_output_at$o__Rhizobiales
 
 # with map() we can easely extract key values from this output, like so:
@@ -1163,12 +1179,20 @@ fisher_to_heatTree(fisher_output = fisher_output_at,
 
 ```
 
+What are we seeing here? each tree shows the full taxonomy of all ASVs that were "important" because they are:
+1) differentially abundant in stress treatment pairwise comparison, OR;
+2) predictors of stress treatments in a random forest, OR;
+3) defined as keystone taxa, module hubs or module connectors in a network
+
+The colored taxa shows adjusted p-values from the fisher test (p >0.15 is turned to grey)
+
+By comparing the full taxonomies of these important ASVs with the the full taxonomies of all ASVs that were NOT "important", we see that o__Rhizobiales and f__Devosiaceae are much too frequent in the "important" ASV dataset. This is likely because they consistently have major roles in stress response and community structure, wich was determined by these 3 analysis methods. note that for this summary we don't consider ASV abundance (number of reads/sequences of each ASV) as it was already accounted for in the other 3 methods.
 
 
 ## 6.6 - make one fisher summary heat tree per species
 now, run these custom functions over lists of phyloseq objects separated by species with mapply
 
-```{r, message = FALSE, warning = FALSE, results='hide'}
+```{r message=FALSE, warning=FALSE, results='hide'}
 
 # run the custom function voer 2 lists of philoseq objects, one with imporntat taxa and other with the full taxa (for every partition)
 fisher_result_l<-mapply(function (list_1,list_2)
@@ -1188,12 +1212,35 @@ fisher_summaries_3l<-mapply(function(list_1,list_2)
     SIMPLIFY = FALSE)
 
 
+```
 
+## 6.7 - Check summary output
 
+To simply the evaluation, let's look into the output species by species
+```{r message=FALSE, warning=FALSE }
+
+# summary in A. thaliana
+fisher_summaries_3l$At
+
+# summary in B oleraceae
+fisher_summaries_3l$Bo_M
+
+# summary in I. tinctoria
+fisher_summaries_3l$It
 
 ```
 
-# that's it, thank you for your time!
+What is the output we have here? let's word it in different ways
+
+In A. thaliana, o__Rhizobiales and f__Devosiaceae are found too often in the importnat ASV subset
+
+In B oleraceae, the proportion of o__Rhizobiales and f__Beijerinckiaceae is significantly higher in the important ASV dataset when considering the full ASV dataset
+
+Do you see that branch from o__Streptomycetales on in I. tinctoria? considering the full dataset, there are too many representatives of that branch in the imporant ASV subset
+
+These summary trees were not particularly highlighted as significant because the base operations to calculate differential abundance, random forest, and networks, was based on a much larger dataset with 70k ASVs, and I did not have the time to re-run it for this 1k ASV dataset.
+
+# That's it, thank you for your time!
 I hope you found the workshop insightful and that you will find the code useful as a template you can improve. feel free to share this with collegues. as you know, you will need many microbiome tutorials for a complete, updated analysis. 
 
 
@@ -1205,7 +1252,7 @@ I hope you found the workshop insightful and that you will find the code useful 
 Are you curious about all the data wrangling of these 2 custom functions? here you can execute a hard-coded version of the function, where you can visualize each object step by step.
 
 
-```{r, include=FALSE}
+```{r eval=FALSE, include=FALSE}
 
 #hard-code input arguments of fisher_all_taxa_groups()
 ps_important_taxa<-imp_ASV_ps_l$At
