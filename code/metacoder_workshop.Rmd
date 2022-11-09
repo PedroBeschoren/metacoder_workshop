@@ -1,13 +1,14 @@
 ---
-title: "metacoder_workshop"
+title: "metacoder workshop for the MICROP consortia"
 output: html_document
 knit: (function(input, ...) {
+    )
     rmarkdown::render(
       input,
       output_dir = "../"
-    )
-  })
 date: "2022-10-25"
+author: "Pedro Beschoren da Costa, PhD"
+institute: "Entomology Department - Wageningen University & Research"
 editor_options: 
   chunk_output_type: console
 ---
