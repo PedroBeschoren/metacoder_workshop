@@ -31,9 +31,9 @@ This step can take some minutes. please install packages ahead of time​!
 Are you curious about the code being sourced from another R script? keep "install\_packages\_load\_libraries.R" selected with your cursor and press F2!
 ## running code chunks
 Bite-sized code chunks will make your script more understandable. even if you don't share, future you will be happy to see small pieces of code instead of huge and complex functions all at once To run a code chunk, you may:
-*click the green triangle on the top right of each chunk ("run current chunk")
-*select the code with the mouse and execute it (ctrl+enter)
-*leave the cursor on the line you want to execute and just execute line by line (ctrl+enter)
+* click the green triangle on the top right of each chunk ("run current chunk")
+* select the code with the mouse and execute it (ctrl+enter)
+* leave the cursor on the line you want to execute and just execute line by line (ctrl+enter)
 
 To find all the code, open the file "./code/metacoder\_workshop.RMD" in your R studio session started from the metacoder\_workshop.Rproj file
 ## Code outline
