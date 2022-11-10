@@ -774,12 +774,12 @@ imp_ASV_ps_l
 ## 6.2 - define the funciton that calculates fisher tests and heat trees
 If we have the time, we explore details for these functions. their description and comments should be fairly sufficiency
 
-the fisher_all_taxa_groups function requires as input: 
-1) a phyloseq object that contains your "important" taxa
-2) a phyloseq objects that contains all your taxa
+the fisher_all_taxa_groups function requires as input: \ 
+1) a phyloseq object that contains your "important" taxa \
+2) a phyloseq objects that contains all your taxa \
 
-the fisher_to_heatTree function requires as input
-1) the output of the fisher_all_taxa_groups function
+the fisher_to_heatTree function requires as input \
+1) the output of the fisher_all_taxa_groups function \
 2) a phyloseq object that contains your "important" taxa
 
 ```{r message=FALSE, warning=FALSE, include=FALSE, results='hide'}
@@ -1443,10 +1443,6 @@ imp_heat_ps<-ps_important_taxa
 #remove unecessary taxonomic indo (dada2id, "S__" and" above_selected)
 tax_table(imp_heat_ps)<-tax_table(imp_heat_ps)[,1:6]
 
-# let's remove the "r__"ranks from the taxonomy, they can be useful but will pollute our plot
-tax_table(imp_heat_ps)[, colnames(tax_table(imp_heat_ps))] <- gsub(pattern = "[a-z]__", # regular expression pattern to search for
-                                                                   x = tax_table(imp_heat_ps)[, colnames(tax_table(imp_heat_ps))], # "df"
-                                                                   replacement = "") # replacement for pattern
 
 # transform from phyloseq to  taxmap object
 imp_heat<-parse_phyloseq(imp_heat_ps)
