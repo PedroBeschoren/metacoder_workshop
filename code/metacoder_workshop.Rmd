@@ -1,5 +1,5 @@
 ---
-title: "metacoder workshop for the MICROP consortia"
+title: "Metacoder workshop for the MICROP consortia"
 output: html_document
 date: "2022-10-25"
 author: "Pedro Beschoren da Costa, PhD"
@@ -29,7 +29,7 @@ source("./code/install_packages_load_libraries.R")
 
 # 2.0 - Load and check data
 
-Here we will load  data from 3 species in the Brassicacea family experiment: Arabidopsis thaliana, Brassica oleraceae and Isatis tinctoria. This data has been heavily filtered to reduce complexity and size. 
+Here we will load  data from 3 species in the Brassicacea family experiment: Arabidopsis thaliana, Brassica oleraceae and Isatis tinctoria. This data has been heavily filtered to reduce complexity and size. These plant species have been exposed to two hormone treatment stresses: Methyl Jasmonate to mimic herbivory and Salicilic acid to mimic pathogens. We sequenced the rhizosphere microbial communities days after stress induction.
 
 ```{r}
 # load object
@@ -44,7 +44,7 @@ ps_rarefied@sam_data [1:5,1:5]# metadata, 5 first rows across 5 first columns
 
 ``` 
 
-Both phyloseq and metacoder can take any feature table with taxonomic ranks and metadata. Therefore you can include community data about fungi, insects, plants etc. To import any kind of data into phyloseq, you cna check this tutorial: https://joey711.github.io/phyloseq/import-data.html#phyloseq-ize_data_already_in_r
+Both phyloseq and metacoder can take any feature table with taxonomic ranks and metadata. Therefore you can include community data about fungi, insects, plants etc. To import any kind of data into phyloseq, you can check this tutorial: https://joey711.github.io/phyloseq/import-data.html#phyloseq-ize_data_already_in_r
 
 
 # 3.0 - Create a single taxmap object for a single heat tree
@@ -55,7 +55,7 @@ For a simple start, let's create individual heat trees from an individual phylos
 # make a copy of you rarefied ps object
 ps_rarefied_filt<-ps_rarefied
 
-#remove unecessary taxonomic info ("ASV_id") by updating the tax table with a subset of the tax table
+#remove detailed taxonomic info ("ASV_id") by updating the tax table with a subset of the tax table. if we include the ASVs the tree will look too busy
 tax_table(ps_rarefied_filt)<-tax_table(ps_rarefied_filt)[,1:6]
 
 
@@ -128,7 +128,7 @@ taxmap_obj$taxa
 
 ## 3.4 - Remove some taxa the heat tree visualization
 
-It might be too dense/complex to look, so let's remove taxa names that can be  unfamiliar like  "phylum NB1-J"
+The tree might be too dense/complex to evaluate directly, so let's remove taxa names that can be  unfamiliar like  "phylum NB1-J"
 
 ```{r, message = FALSE, warning = FALSE}
 
