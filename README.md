@@ -6,6 +6,9 @@ In this workshop, we will learn how to use the metacoder R package. This is what
 * use custom functions to streamline the process, then run the over lists of phyloseq objects
 * add some random external data to the heat tree
 * put the output of fisher tests into a heat tree
+### An example of the firegues you will generate in this workshop 
+![Comparison of microbial communities in two lineages of Brassicaceae plants](https://github.com/PedroBeschoren/metacoder_workshop/blob/master/results/heat_tree_diff_lineages.pdf)
+In this type of visualization (a heat tree) you can evaluate the entire taxonomy of you community at once, while color-coding differences in abundances of each individual taxan level
 ## Requirements
 * R version 4.1.2 or above
 * R studio from 2018 or above. you likely won't have any problems with R studio versions.  v0.98.932 was one of the first R studio versions to handle markdown documents in 2014... I've used R studio version 2022.07.2 to prepare the workshop
