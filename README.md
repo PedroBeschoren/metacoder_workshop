@@ -6,7 +6,7 @@ In this workshop, we will learn how to use the metacoder R package. This is what
 * use custom functions to streamline the process, then run the over lists of phyloseq objects
 * add some random external data to the heat tree
 * put the output of fisher tests into a heat tree
-### An example of the firegues you will generate in this workshop 
+### An example of the figures you will generate in this workshop 
 ![Comparison of microbial communities in two lineages of Brassicaceae plants](https://github.com/PedroBeschoren/metacoder_workshop/assets/43226800/34b6dafa-8087-47ff-a7fe-41ca449f4c08)
 Example figure 1: Comparison of microbial communities in two lineages of Brassicaceae plants. In this type of visualization (a heat tree) you can evaluate the entire taxonomy of you community at once, while color-coding differences in abundances of each individual taxon level
 ## Requirements
